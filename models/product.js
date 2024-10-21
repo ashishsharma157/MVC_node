@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const Cart=require('./cart');
 
 const p = path.join(
   path.dirname(process.mainModule.filename),
@@ -22,18 +23,43 @@ const getProductFromFile = (cb) => {
 };
 const products = [];
 module.exports = class Product {
-  constructor(title, imageUrl, description, price) {
+  constructor(id, title, imageUrl, description, price) {
+    this.id = id;
     this.title = title;
     (this.imageUrl = imageUrl), (this.description = description);
     this.price = price;
   }
 
   save() {
-    this.id = Math.random().toString();
     getProductFromFile((product) => {
-      product.push(this);
-      fs.writeFile(p, JSON.stringify(product), (err) => {
-        console.log(err);
+      if (this.id) {
+        const existingProductIndex = product.findIndex(
+          (prod) => prod.id === this.id
+        );
+        const updatedProducts = [...product];
+        updatedProducts[existingProductIndex] = this;
+        fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+          console.log(err);
+        });
+      } else {
+        this.id = Math.random().toString();
+        product.push(this);
+        fs.writeFile(p, JSON.stringify(product), (err) => {
+          console.log(err);
+        });
+      }
+    });
+  }
+
+  static delete(id) {
+    getProductFromFile((products) => {
+      const product=products.find(prod=>prod.id===id);
+      const remainProduct = products.filter((prod) => prod.id !== id);
+      console.log(remainProduct);
+      fs.writeFile(p, JSON.stringify(remainProduct), (err) => {
+        if(!err){
+          Cart.deleteProduct(id, product.price);
+        }
       });
     });
   }
@@ -41,10 +67,10 @@ module.exports = class Product {
   static fetchAll(cb) {
     getProductFromFile(cb);
   }
-  static findById(id, cb){
-    getProductFromFile(products=>{
-      const product=products.find(p=> p.id===id);
+  static findById(id, cb) {
+    getProductFromFile((products) => {
+      const product = products.find((p) => p.id === id);
       cb(product);
-    })
+    });
   }
 };
