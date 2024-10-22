@@ -1,94 +1,27 @@
-//const fs = require("fs");
-//const path = require("path");
-const Cart = require("./cart");
-const db = require("../util/database");
+const Sequelize = require("sequelize");
 
-// const p = path.join(
-//   path.dirname(process.mainModule.filename),
-//   "data",
-//   "products.json"
-// );
-// const getProductFromFile = (cb) => {
-//   fs.readFile(p, (err, fileContent) => {
-//     if (err) {
-//       console.log(err);
-//       cb([]);
-//     } else {
-//       if (fileContent.length === 0) {
-//         cb([]);
-//       } else {
-//         cb(JSON.parse(fileContent));
-//       }
-//     }
-//   });
-// };
-const products = [];
-module.exports = class Product {
-  constructor(id, title, imageUrl, description, price) {
-    this.id = id;
-    this.title = title;
-    (this.imageUrl = imageUrl), (this.description = description);
-    this.price = price;
-  }
+const sequelize = require("../util/database");
 
-  // save() {
-  //   getProductFromFile((product) => {
-  //     if (this.id) {
-  //       const existingProductIndex = product.findIndex(
-  //         (prod) => prod.id === this.id
-  //       );
-  //       const updatedProducts = [...product];
-  //       updatedProducts[existingProductIndex] = this;
-  //       fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-  //         console.log(err);
-  //       });
-  //     } else {
-  //       this.id = Math.random().toString();
-  //       product.push(this);
-  //       fs.writeFile(p, JSON.stringify(product), (err) => {
-  //         console.log(err);
-  //       });
-  //     }
-  //   });
-  // }
+const Product = sequelize.define("product", {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  title: Sequelize.STRING,
+  price: {
+    type: Sequelize.DOUBLE,
+    allowNull: false,
+  },
+  imageUrl: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+});
 
-  // static delete(id) {
-  //   getProductFromFile((products) => {
-  //     const product=products.find(prod=>prod.id===id);
-  //     const remainProduct = products.filter((prod) => prod.id !== id);
-  //     console.log(remainProduct);
-  //     fs.writeFile(p, JSON.stringify(remainProduct), (err) => {
-  //       if(!err){
-  //         Cart.deleteProduct(id, product.price);
-  //       }
-  //     });
-  //   });
-  // }
-
-  // static fetchAll(cb) {
-  //   getProductFromFile(cb);
-  // }
-  // static findById(id, cb) {
-  //   getProductFromFile((products) => {
-  //     const product = products.find((p) => p.id === id);
-  //     cb(product);
-  //   });
-  // }
-
-  save() {
-    return db.execute(
-      "Insert into products(title, description, imageUrl, price) values (?,?,?,?)",
-      [this.title, this.description, this.imageUrl, this.price]
-    );
-  }
-
-  static deleteById(id) {}
-
-  static fetchAll() {
-    return db.execute("SELECT * FROM products");
-  }
-
-  static findById(id) {
-    return db.execute("SELECT * FROM products where id=?", [id]);
-  }
-};
+module.exports=Product;

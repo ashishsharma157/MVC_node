@@ -2,8 +2,8 @@ const Product = require("../models/product");
 const Cart = require("../models/cart");
 const path = require("../util/path");
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-    .then(([products]) => {
+  Product.findAll()
+    .then((products) => {
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All products",
@@ -11,18 +11,36 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => console.log(err));
+  // Product.fetchAll()
+  //   .then(([products]) => {
+  //     res.render("shop/product-list", {
+  //       prods: products,
+  //       pageTitle: "All products",
+  //       path: "/products",
+  //     });
+  //   })
+  //   .catch((err) => console.log(err));
 };
 
 exports.getIndex = (req, res, next) => {
-  const products = Product.fetchAll()
-    .then(([rows, fieldData]) => {
+  Product.findAll()
+    .then((products) => {
       res.render("shop/index", {
-        prods: rows,
+        prods: products,
         pageTitle: "Shop",
         path: "/",
       });
     })
     .catch((err) => console.log(err));
+  // const products = Product.fetchAll()
+  //   .then(([rows, fieldData]) => {
+  //     res.render("shop/index", {
+  //       prods: rows,
+  //       pageTitle: "Shop",
+  //       path: "/",
+  //     });
+  //   })
+  //   .catch((err) => console.log(err));
 };
 exports.getCart = (req, res, next) => {
   Cart.getCartProducts((cart) => {
@@ -68,16 +86,24 @@ exports.getCheckout = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(([row, data]) => {
-      console.log(row);
+  Product.findAll({ where: { id: prodId } })
+    .then((product) => {
       res.render("shop/product-detail", {
-        product: row[0],
-        pageTitle: row[0].title,
+        product: product[0],
+        pageTitle: product[0].title,
         path: "/products",
       });
     })
     .catch((err) => console.log(err));
+  // Product.findByPk(prodId)
+  //   .then((product) => {
+  //     res.render("shop/product-detail", {
+  //       product: product,
+  //       pageTitle: product.title,
+  //       path: "/products",
+  //     });
+  //   })
+  //   .catch((err) => console.log(err));
 };
 
 exports.postCart = (req, res, next) => {
