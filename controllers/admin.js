@@ -18,6 +18,7 @@ exports.addNewProduct = (req, res, next) => {
     description: description,
     price: price,
     imageUrl: imageUrl,
+    userId: req.user.id,
   })
     .then((result) => {
       console.log(result);
